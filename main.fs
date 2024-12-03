@@ -1,7 +1,6 @@
 namespace AOC2024
 
 module Main =
-
   open System
   open System.IO
 
@@ -14,5 +13,9 @@ module Main =
        | "2" -> 
         (Day02.run "./input/day02-test.txt") ||> printfn "test: %d %d"
         (Day02.run "./input/day02-prod.txt") ||> printfn "prod: %d %d"
+       | "3" -> 
+        (Day03.run "./input/day03-test.txt") ||> printfn "test: %d %d"
+        (Day03.run "./input/day03-test2.txt") ||> printfn "test2: %d %d"
+        (Day03.run "./input/day03-prod.txt") ||> printfn "prod: %d %d"
        | _ -> Console.WriteLine "Specify a Day to run"
     0
