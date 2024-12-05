@@ -20,5 +20,8 @@ module Main =
        | "4" -> 
         (Day04.run "./input/day04-test.txt") ||> printfn "test: %d %d"
         (Day04.run "./input/day04-prod.txt") ||> printfn "prod: %d %d"
+       | "5" ->
+        (Day05.run "./input/day05-test.txt") ||> printfn "test: %d %d"
+        (Day05.run "./input/day05-prod.txt") ||> printfn "prod: %d %d"
        | _ -> Console.WriteLine "Specify a Day to run"
     0
