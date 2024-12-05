@@ -13,10 +13,9 @@ module Day03 =
     let lines = File.ReadAllText inputFile      
 
     let part1 = 
-      seq { 
-        for m in mulA.Matches(lines) do 
-          yield int(m.Groups["a"].Value) * int(m.Groups["b"].Value) 
-      } |> Seq.sum
+      mulA.Matches(lines)
+      |> Seq.map(fun m -> int(m.Groups["a"].Value) * int(m.Groups["b"].Value))
+      |> Seq.sum
 
     let part2 = 
       let folder((enabled, acc): bool * int) (ins: Match) : bool * int = 

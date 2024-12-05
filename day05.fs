@@ -14,11 +14,9 @@ module Day05 =
     let prints = blocks.[1].Split("\n") |> Seq.map(_.Split(',')) |>(Seq.map (Array.map int))
 
     let isValidByRule (list : int array) =
-      let len = Array.length list
+      let max = Array.length list - 1
       seq {
-        for l in 0 .. (len-1) do
-          for r in l .. (len-1) do
-            yield [|list.[r]; list.[l]|]
+        for l in 0 .. max do for r in l .. max -> [|list.[r]; list.[l]|]
       }
       |> Seq.exists(fun a -> Set.contains a rules)
       |> not
@@ -26,11 +24,10 @@ module Day05 =
     let compareByRule (ia, a) (ib, b) =
       if Set.contains [|a;b|] rules then
          1
+      elif Set.contains [|b;a|] rules then
+         -1
       else
-        if Set.contains [|b;a|] rules then
-           -1
-        else
-          compare ia ib
+        compare ia ib
 
     let fixOrder s =
       s

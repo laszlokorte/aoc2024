@@ -60,7 +60,7 @@ module Day04 =
 
                     for x in [down_right; up_left] do 
                         for y in [up_right; down_left] do
-                            [x;y]
+                            yield [x;y]
         }
         |> (Seq.map >> Seq.map >> Seq.map) lookup
         |> Seq.filter (Seq.forall isWord  )
