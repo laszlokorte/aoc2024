@@ -4,24 +4,40 @@ module Main =
   open System
   open System.IO
 
+  let days = [
+    Day01.run
+    Day02.run
+    Day03.run
+    Day04.run
+    Day05.run
+  ]
+
+  let dayNames =
+    days
+    |> Seq.indexed
+    |> Seq.map(fst)
+    |> Seq.map(fun x -> x + 1)
+    |> Seq.map(string)
+
+  let input day env =
+    match (day, env) with
+      | (3, "test") -> [$"./input/day03-test.txt";$"./input/day03-test2.txt"]
+      | _ -> [$"./input/day{day:D2}-{env}.txt"]
+
+  let runDay num env =
+    printfn "%s" env
+    for input in (input num env) do
+      days.[num-1] input ||> printfn "%d %d"
+
+
   [<EntryPoint>]
   let main argv =
-    match argv.[0] with
-       | "1" -> 
-        (Day01.run "./input/day01-test.txt") ||> printfn "test: %d %d"
-        (Day01.run "./input/day01-prod.txt") ||> printfn "prod %d %d"
-       | "2" -> 
-        (Day02.run "./input/day02-test.txt") ||> printfn "test: %d %d"
-        (Day02.run "./input/day02-prod.txt") ||> printfn "prod: %d %d"
-       | "3" -> 
-        (Day03.run "./input/day03-test.txt") ||> printfn "test: %d %d"
-        (Day03.run "./input/day03-test2.txt") ||> printfn "test2: %d %d"
-        (Day03.run "./input/day03-prod.txt") ||> printfn "prod: %d %d"
-       | "4" -> 
-        (Day04.run "./input/day04-test.txt") ||> printfn "test: %d %d"
-        (Day04.run "./input/day04-prod.txt") ||> printfn "prod: %d %d"
-       | "5" ->
-        (Day05.run "./input/day05-test.txt") ||> printfn "test: %d %d"
-        (Day05.run "./input/day05-prod.txt") ||> printfn "prod: %d %d"
-       | _ -> Console.WriteLine "Specify a Day to run"
-    0
+    match System.Int32.TryParse argv.[0] with
+    | true, day ->
+      runDay day "test"
+      runDay day "prod"
+      0
+    | _ ->
+      printfn "Specify a valid Day to run"
+      printfn "Either of: %s" (String.concat ", " dayNames)
+      1
