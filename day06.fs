@@ -77,4 +77,4 @@ module Day06 =
         loop)
       |> Set.count
 
-    part1, part2
+    (string part1), (string part2)

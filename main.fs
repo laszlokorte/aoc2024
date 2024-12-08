@@ -30,7 +30,7 @@ module Main =
   let runDay num env =
     printfn "%s" env
     for input in (input num env) do
-      days.[num-1] input ||> printfn "%d %d"
+      days.[num-1] input ||> printfn "%s %s"
 
 
   [<EntryPoint>]

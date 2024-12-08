@@ -7,4 +7,4 @@ module Day08 =
   let run inputFile =
     let lines = File.ReadAllText inputFile
 
-    (0,0)
+    (string 0, string 0)

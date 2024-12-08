@@ -23,4 +23,4 @@ module Day01 =
         Map.tryFind v counts |> Option.defaultValue 0
       leftColumn |> List.map(fun n -> n * count n) |> List.sum
 
-    (part1, part2)
+    (string part1), (string part2)

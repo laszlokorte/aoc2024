@@ -50,4 +50,4 @@ module Day05 =
       |> Seq.sum
 
 
-    part1, part2
+    (string part1), (string part2)

@@ -30,4 +30,4 @@ module Day03 =
       
       Seq.fold folder (true, 0) (mulB.Matches(lines)) |> snd
 
-    part1, part2
+    (string part1), (string part2)
