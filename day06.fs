@@ -40,22 +40,41 @@ module Day06 =
     let startPos = findIndex2D (fun e -> Map.containsKey e startMarker) map
     let startDir = Map.find (map |> Array2D.get <|| startPos) startMarker
 
-    let step (dir, (x,y)) =
+    let step obs (dir, (x,y)) =
       let (dx, dy) = delta dir
       let newPos = (x+dx, y+dy)
       let (nx, ny) = newPos
 
       if nx < 0 || ny < 0 || nx >= height || ny >= width then
         None
-      elif obstacles |> Array2D.get <|| newPos then
-        Some ((x,y), (clockwise dir, (x,y)))
+      elif obs |> Array2D.get <|| newPos then
+        Some (((x,y), dir), (clockwise dir, (x,y)))
       else
-        Some ((x,y), (dir, newPos))
+        Some (((x,y), dir), (dir, newPos))
 
 
-    let walk : (int * int) seq = Seq.unfold step (startDir, startPos)
-    let trace a b = Set.add b a
-    let part1 = Seq.fold trace (Set.singleton startPos) walk |> Set.count
+    let walk obs : ((int * int) * Direction) seq = Seq.unfold (step obs) (startDir, startPos)
+    let trace acc (pos, _dir) = Set.add pos acc
+    let visited = Seq.fold trace (Set.singleton startPos) (walk obstacles)
+    let part1 = visited |> Set.count |> (+) 1
 
 
-    (part1,0)
+    let part2 =
+      let possibleObstacles = Set.remove startPos visited
+      let detectLoop acc step =
+        Set.add step acc
+
+      possibleObstacles
+      |> Set.filter (fun (x,y) ->
+        obstacles[x,y] <- true
+        let loop =
+          Seq.scan detectLoop (Set.singleton (startPos, startDir)) (walk obstacles)
+          |> Seq.pairwise
+          |> Seq.skip 1
+          |> Seq.exists (fun (a, b) -> Set.count a = Set.count b)
+
+        obstacles[x,y] <- false
+        loop)
+      |> Set.count
+
+    part1, part2
