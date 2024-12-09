@@ -4,6 +4,17 @@ module Day07 =
   open System
   open System.IO
   open System.Text.RegularExpressions
+  open System
+
+  let rec cartesianProduct n array =
+    if n = 1 then
+        array |> Array.map (fun x -> [|x|])
+    else
+        array
+        |> Array.collect (fun x ->
+            cartesianProduct (n - 1) array
+            |> Array.map (fun subArray -> Array.append [|x|] subArray))
+
 
   let run inputFile =
     let lines = File.ReadLines inputFile
@@ -11,19 +22,24 @@ module Day07 =
     let split s = Regex.Split(s, @":?\s+")
     let equations = lines |> Seq.map(split >> (Seq.map int64))
 
-    let fitOperators numbers =
+
+    let plus = (+)
+    let mul a b = a * b
+    let concatDigits (x: int64) (y: int64) : int64 =
+      let rec countDigits (n: int64) =
+          if n = 0L then 0 else 1 + countDigits (n / 10L)
+
+      let powerOfTen = pown 10L (countDigits y)
+      (x * powerOfTen) + y
+
+    let fitOperators ops numbers =
+      let numOps = Array.length ops
       let res = Seq.head numbers
       let nums = Seq.tail numbers
       let firstNum = Seq.head nums
       let restNums = Seq.tail nums
       let opCount = (Seq.length restNums)
-      let combiCount = 1 <<< opCount
-      let plus = (+)
-      let mul a b = a * b
-      let opSeq = seq {
-        for c in 0 .. (combiCount-1) do
-          [for o in 0 .. (opCount-1) ->  if (1<<<o &&& c) > 0 then plus else mul]
-      }
+      let opSeq = cartesianProduct  opCount ops
 
       Seq.exists (fun ops ->
         let steps = Seq.zip ops restNums
@@ -32,6 +48,7 @@ module Day07 =
 
         result = res
       ) opSeq
-    let part1 = equations |> (Seq.filter fitOperators) |> Seq.map(Seq.head) |> Seq.sum
+    let part1 = equations |> (Seq.filter (fitOperators [|plus;mul|])) |> Seq.map(Seq.head) |> Seq.sum
+    let part2 = equations |> (Seq.filter (fitOperators [|plus;mul;concatDigits|])) |> Seq.map(Seq.head) |> Seq.sum
 
-    (string part1, string 0)
+    (string part1, string part2)

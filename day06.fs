@@ -32,32 +32,32 @@ module Day06 =
 
   let run inputFile =
     let lines = File.ReadLines inputFile
-
     let startMarker = [|('v', Down);('<', Left);('>', Right);('^', Up)|] |> Map.ofArray
     let map = lines |> array2D
     let (height, width) = (Array2D.length1 map), (Array2D.length2 map)
     let obstacles = map |> Array2D.map ((=) '#')
     let startPos = findIndex2D (fun e -> Map.containsKey e startMarker) map
     let startDir = Map.find (map |> Array2D.get <|| startPos) startMarker
+    let outOfBounds (x,y) = x < 0 || y < 0 || x >= height || y >= width
 
-    let step obs (dir, (x,y)) =
+    let step canWalk (dir, (x,y)) =
       let (dx, dy) = delta dir
       let newPos = (x+dx, y+dy)
-      let (nx, ny) = newPos
-
-      if nx < 0 || ny < 0 || nx >= height || ny >= width then
+      if outOfBounds (x,y) then
         None
-      elif obs |> Array2D.get <|| newPos then
-        Some (((x,y), dir), (clockwise dir, (x,y)))
-      else
+      elif canWalk newPos then
         Some (((x,y), dir), (dir, newPos))
+      else
+        Some (((x,y), dir), (clockwise dir, (x,y)))
 
+    let canWalk obs (x,y) =
+      outOfBounds (x,y) ||
+      (obs |> Array2D.get <|| (x,y) |> not)
 
-    let walk obs : ((int * int) * Direction) seq = Seq.unfold (step obs) (startDir, startPos)
+    let walk canWalk : ((int * int) * Direction) seq = Seq.unfold (step canWalk) (startDir, startPos)
     let trace acc (pos, _dir) = Set.add pos acc
-    let visited = Seq.fold trace (Set.singleton startPos) (walk obstacles)
-    let part1 = visited |> Set.count |> (+) 1
-
+    let visited = Seq.fold trace (Set.singleton startPos) (walk (canWalk obstacles))
+    let part1 = visited |> Set.count
 
     let part2 =
       let possibleObstacles = Set.remove startPos visited
@@ -66,14 +66,14 @@ module Day06 =
 
       possibleObstacles
       |> Set.filter (fun (x,y) ->
-        obstacles[x,y] <- true
+        let canWalkPrime targetPos =
+          targetPos <> (x,y) && (canWalk obstacles targetPos)
+
         let loop =
-          Seq.scan detectLoop (Set.singleton (startPos, startDir)) (walk obstacles)
+          Seq.scan detectLoop (Set.singleton (startPos, startDir)) (walk canWalkPrime)
           |> Seq.pairwise
           |> Seq.skip 1
           |> Seq.exists (fun (a, b) -> Set.count a = Set.count b)
-
-        obstacles[x,y] <- false
         loop)
       |> Set.count
 
